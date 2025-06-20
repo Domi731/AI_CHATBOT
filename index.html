@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot - Futuristic Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #0a0a0a, #1a1a2e, #16213e);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bot-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #00ff88;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 3px;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .avatar.bot {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .avatar.user {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 16px 20px;
+            border-radius: 20px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.bot .message-content {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .timestamp {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        .input-area {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #messageInput {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            color: #ffffff;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            min-height: 50px;
+            max-height: 120px;
+        }
+
+        #messageInput:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        #messageInput::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .send-button {
+            position: absolute;
+            right: 8px;
+            bottom: 13px;
+            width: 34px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .send-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.5);
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .welcome-message h2 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .controls {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .control-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>
+                🤖 AI Chatbot
+            </h1>
+            <div class="bot-status">
+                <div class="status-dot"></div>
+                Online
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome-message">
+                <h2>Willkommen! 👋</h2>
+                <p>Ich bin dein KI-Assistent. Schreib mir einfach eine Nachricht!</p>
+                <p><small>💡 Tipp: Drücke Enter zum Senden, Shift+Enter für neue Zeile</small></p>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="avatar bot">🤖</div>
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+            <span style="color: rgba(255,255,255,0.6); font-size: 12px;">Bot tippt...</span>
+        </div>
+
+        <div class="input-area">
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Schreib deine Nachricht hier... (Enter zum Senden)"
+                        rows="1"
+                    ></textarea>
+                    <button class="send-button" id="sendButton">
+                        ➤
+                    </button>
+                </div>
+                <div class="controls">
+                    <button class="control-btn" onclick="showStats()">📊 Stats</button>
+                    <button class="control-btn" onclick="clearChat()">🗑️ Clear</button>
+                    <button class="control-btn" onclick="saveChat()">💾 Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chatbot Logik (vereinfachte Version der Python-Klasse)
+        class AIChatbot {
+            constructor() {
+                this.name = "Alex";
+                this.conversationHistory = [];
+                this.userData = {};
+                
+                this.responses = {
+                    'greeting': [
+                        "Hallo! Wie kann ich dir heute helfen? 😊",
+                        "Hi! Schön dich zu sehen! 👋",
+                        "Hallo! Wie geht es dir denn? 🌟",
+                        "Hey! Was kann ich für dich tun? ✨"
+                    ],
+                    'goodbye': [
+                        "Auf Wiedersehen! Bis zum nächsten Mal! 👋",
+                        "Tschüss! War schön mit dir zu reden! 😊",
+                        "Bis bald! Pass auf dich auf! 🌟",
+                        "Ciao! Komm gerne wieder! ✨"
+                    ],
+                    'how_are_you': [
+                        "Mir geht es gut, danke der Nachfrage! Wie geht es dir? 😊",
+                        "Ich bin bereit zu helfen! Wie fühlst du dich? 🚀",
+                        "Prima! Ich bin voller Energie. Und du? ⚡",
+                        "Bestens! Danke fürs Fragen. Was machst du so? 🌈"
+                    ],
+                    'name_question': [
+                        `Ich bin ${this.name}, dein KI-Assistent! 🤖`,
+                        `Mein Name ist ${this.name}. Freut mich! 😊`,
+                        `Du kannst mich ${this.name} nennen! ✨`
+                    ],
+                    'help': [
+                        "Ich kann dir bei verschiedenen Dingen helfen: Fragen beantworten, Gespräche führen, Witze erzählen und mehr! 🚀",
+                        "Gerne helfe ich dir! Frag mich einfach was du wissen möchtest. 💡",
+                        "Ich bin hier um zu helfen! Was beschäftigt dich? 🤝"
+                    ],
+                    'joke': [
+                        "Warum nehmen Geister keinen Aufzug? Sie haben Angst vor dem Fahrstuhl-Geist! 👻😄",
+                        "Was ist grün und klopft an der Tür? Ein Klopfsalat! 🥬😂",
+                        "Warum können Geister so schlecht lügen? Weil man durch sie hindurchsehen kann! 👻😆",
+                        "Was sagt ein großer Stift zum kleinen Stift? Wachs-tum! ✏️🌱"
+                    ],
+                    'compliment': [
+                        "Danke, das ist sehr nett von dir! 😊💖",
+                        "Du bist auch toll! Danke für die netten Worte! 🌟",
+                        "Das freut mich zu hören! Du machst meinen Tag besser! ✨😊"
+                    ],
+                    'default': [
+                        "Das ist interessant! Erzähl mir mehr davon. 🤔",
+                        "Hmm, das kann ich nicht ganz verstehen. Kannst du es anders formulieren? 🤷‍♂️",
+                        "Interessant! Was denkst du denn darüber? 💭",
+                        "Das ist eine gute Frage! Wie siehst du das denn? 🤔",
+                        "Aha! Möchtest du mir mehr darüber erzählen? 😊"
+                    ]
+                };
+                
+                this.patterns = {
+                    'greeting': /\b(hallo|hi|hey|guten tag|servus|moin)\b/i,
+                    'goodbye': /\b(tschüss|auf wiedersehen|bye|ciao|bis bald|tschau)\b/i,
+                    'how_are_you': /\b(wie geht.{1,10}dir|wie fühlst du dich|alles gut|geht.{1,5}so)\b/i,
+                    'name_question': /\b(wie heißt du|dein name|wer bist du)\b/i,
+                    'help': /\b(hilf mir|kannst du helfen|was kannst du|hilfe)\b/i,
+                    'joke': /\b(witz|lustig|scherz|lach|witzig)\b/i,
+                    'compliment': /\b(toll|super|klasse|großartig|fantastisch|gut gemacht)\b/i,
+                    'math': /\b(\d+\s*[\+\-\*\/]\s*\d+)\b/
+                };
+            }
+            
+            detectIntent(message) {
+                const messageLower = message.toLowerCase();
+                
+                for (const [intent, pattern] of Object.entries(this.patterns)) {
+                    if (pattern.test(messageLower)) {
+                        return intent;
+                    }
+                }
+                return 'default';
+            }
+            
+            handleMath(message) {
+                const mathPattern = /(\d+)\s*([\+\-\*\/])\s*(\d+)/;
+                const match = message.match(mathPattern);
+                
+                if (match) {
+                    const [, num1, operator, num2] = match;
+                    const n1 = parseInt(num1);
+                    const n2 = parseInt(num2);
+                    
+                    let result;
+                    switch (operator) {
+                        case '+': result = n1 + n2; break;
+                        case '-': result = n1 - n2; break;
+                        case '*': result = n1 * n2; break;
+                        case '/': 
+                            if (n2 === 0) return "Division durch Null ist nicht möglich! 🤔";
+                            result = n1 / n2; 
+                            break;
+                    }
+                    
+                    return `${n1} ${operator} ${n2} = ${result} 🧮`;
+                }
+                
+                return "Ich konnte keine Rechenaufgabe in deiner Nachricht finden. 🤔";
+            }
+            
+            getResponse(message) {
+                if (!message.trim()) {
+                    return "Bitte sag etwas! Ich höre zu. 👂";
+                }
+                
+                const intent = this.detectIntent(message);
+                
+                let response;
+                if (intent === 'math') {
+                    response = this.handleMath(message);
+                } else {
+                    const responses = this.responses[intent] || this.responses['default'];
+                    response = responses[Math.floor(Math.random() * responses.length)];
+                }
+                
+                // Zur Historie hinzufügen
+                this.conversationHistory.push({
+                    userMessage: message,
+                    botResponse: response,
+                    timestamp: new Date(),
+                    intent: intent
+                });
+                
+                return response;
+            }
+            
+            getStats() {
+                if (this.conversationHistory.length === 0) {
+                    return { messages: 0, mostCommonIntent: "keine" };
+                }
+                
+                const intents = this.conversationHistory.map(entry => entry.intent);
+                const intentCounts = {};
+                intents.forEach(intent => {
+                    intentCounts[intent] = (intentCounts[intent] || 0) + 1;
+                });
+                
+                const mostCommon = Object.keys(intentCounts).reduce((a, b) => 
+                    intentCounts[a] > intentCounts[b] ? a : b
+                );
+                
+                return {
+                    messages: this.conversationHistory.length,
+                    mostCommonIntent: mostCommon
+                };
+            }
+        }
+
+        // UI Controller
+        const bot = new AIChatbot();
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Enter key handling
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        sendButton.addEventListener('click', sendMessage);
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('de-DE', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="avatar ${isUser ? 'user' : 'bot'}">
+                    ${isUser ? '👤' : '🤖'}
+                </div>
+                <div class="message-content">
+                    ${content}
+                    <div class="timestamp">${timeString}</div>
+                </div>
+            `;
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            typingIndicator.style.display = 'flex';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // User Message hinzufügen
+            addMessage(message, true);
+            
+            // Input leeren
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            
+            // Typing Indicator zeigen
+            showTyping();
+            
+            // Simuliere Verzögerung für realistisches Gefühl
+            await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+            
+            // Bot Response
+            const response = bot.getResponse(message);
+            
+            hideTyping();
+            addMessage(response);
+        }
+
+        function showStats() {
+            const stats = bot.getStats();
+            const statsMessage = `📊 **Gesprächsstatistiken:**\n\n• Nachrichten: ${stats.messages}\n• Häufigster Intent: ${stats.mostCommonIntent}`;
+            addMessage(statsMessage);
+        }
+
+        function clearChat() {
+            const messages = chatContainer.querySelectorAll('.message');
+            messages.forEach(msg => msg.remove());
+            
+            // Welcome message wieder hinzufügen
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'welcome-message';
+            welcomeDiv.innerHTML = `
+                <h2>Chat geleert! 🧹</h2>
+                <p>Bereit für ein neues Gespräch!</p>
+            `;
+            chatContainer.appendChild(welcomeDiv);
+        }
+
+        function saveChat() {
+            const chatData = {
+                timestamp: new Date().toISOString(),
+                messages: bot.conversationHistory
+            };
+            
+            const dataStr = JSON.stringify(chatData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `chat_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+            
+            addMessage("Chat wurde erfolgreich gespeichert! 💾");
+        }
+
+        // Floating particles effect
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+            
+            document.querySelector('.floating-particles').appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 10000);
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 2000);
+
+        // Initial focus
+        messageInput.focus();
+    </script>
+</body>
+</html>
